@@ -1,0 +1,393 @@
+<!-- Filter Section -->
+<section class="mb-4">
+  <div class="container">
+    <div class="card">
+      <div class="card-body">
+        <form [formGroup]="filterForm" class="row g-3">
+          <!-- Status Filter -->
+          <div class="col-md-3">
+            <label class="form-label">Status</label>
+            <select formControlName="status" class="form-select">
+              <option value="">All Statuses</option>
+              <option value="pending">Pending</option>
+              <option value="approved">Approved</option>
+              <option value="rejected">Rejected</option>
+              <option value="resubmitted">Resubmitted</option>
+              <option value="closed">Closed</option>
+              <option value="resubmit">Resubmit</option>
+            </select>
+          </div>
+
+          <!-- Search Input -->
+          <div class="col-md-3">
+            <label class="form-label">Search</label>
+            <input 
+              type="text" 
+              formControlName="searchTerm" 
+              class="form-control" 
+              placeholder="Search by Name, Location, ID"
+            >
+          </div>
+
+          <!-- From Date -->
+          <div class="col-md-2">
+            <label class="form-label">From Date</label>
+            <input type="date" formControlName="from_date" class="form-control">
+          </div>
+
+          <!-- To Date -->
+          <div class="col-md-2">
+            <label class="form-label">To Date</label>
+            <input type="date" formControlName="to_date" class="form-control">
+          </div>
+
+          <!-- Filter Actions -->
+          <div class="col-md-2 d-flex align-items-end">
+            <button 
+              type="button" 
+              (click)="resetFilters()" 
+              class="btn btn-secondary me-2"
+            >
+              Reset
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Action Buttons -->
+<div class="container mb-3">
+  <button 
+    type="button" 
+    class="btn btn-primary me-2" 
+    data-bs-toggle="modal" 
+    data-bs-target="#createEmployeeModal"
+  >
+    Create Employee
+  </button>
+  
+  <button 
+    type="button" 
+    class="btn btn-success" 
+    data-bs-toggle="modal" 
+    data-bs-target="#createManagerModal"
+  >
+    Create Manager
+  </button>
+</div>
+
+<!-- Travel Requests Table -->
+<div class="container">
+  <div class="card">
+    <div class="card-body table-responsive">
+      <table class="table table-hover">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Requested Date</th>
+            <th>Name</th>
+            <th>From Location</th>
+            <th>To Location</th>
+            <th>From Date</th>
+            <th>To Date</th>
+            <th>Status</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let request of filteredTravelRequests">
+            <td>{{ request.id }}</td>
+            <td>{{ request.date_submitted | date: 'dd-MM-yyyy' }}</td>
+            <td>{{ request.name }}</td>
+            <td>{{ request.from_location }}</td>
+            <td>{{ request.to_location }}</td>
+            <td>{{ request.from_date | date: 'dd-MM-yyyy' }}</td>
+            <td>{{ request.to_date | date: 'dd-MM-yyyy' }}</td>
+            <td>
+              <span 
+                class="badge" 
+                [ngClass]="{
+                  'bg-success': request.status === 'approved',
+                  'bg-danger': request.status === 'rejected',
+                  'bg-warning': request.status === 'resubmitted',
+                  'bg-secondary': request.status === 'resubmit',
+                  'bg-info': request.status === 'pending',
+                  'bg-primary': request.status === 'closed'
+                }"
+              >
+                {{ request.status }}
+              </span>
+            </td>
+            <td>
+              <!-- Request for More Info Button -->
+              <button 
+                class="btn btn-secondary btn-sm me-1" 
+                data-bs-toggle="modal" 
+                data-bs-target="#resubmitModal" 
+                (click)="openResubmitModal(request)"
+              >
+                <i class="bi bi-arrow-repeat"></i> Req More
+              </button>
+
+              <!-- View Details Button -->
+              <button 
+                class="btn btn-primary btn-sm me-1" 
+                data-bs-toggle="modal" 
+                data-bs-target="#viewModal" 
+                (click)="viewRequest(request)"
+              >
+                <i class="bi bi-eye-fill"></i>
+              </button>
+
+              <!-- Close Button -->
+              <button 
+                class="btn btn-success btn-sm" 
+                (click)="closeRequest(request.id)" 
+                [disabled]="request.status !== 'approved'"
+              >
+                <i class="bi bi-check-circle"></i> Close
+              </button>
+            </td>
+          </tr>
+          
+          <!-- No Results Message -->
+          <tr *ngIf="filteredTravelRequests.length === 0">
+            <td colspan="9" class="text-center text-muted">
+              No travel requests found matching the current filters.
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- Resubmit Modal -->
+<div class="modal fade" id="resubmitModal" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Resubmit Request</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <textarea 
+          [(ngModel)]="resubmitNote" 
+          class="form-control" 
+          placeholder="Enter reason for resubmission"
+        ></textarea>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary" data-bs-dismiss="modal" (click)="confirmResubmit()">Send</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- View Modal -->
+<div class="modal fade" id="viewModal" tabindex="-1">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Request Details</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body" *ngIf="selectedRequest">
+        <table class="table table-bordered">
+          <tbody>
+            <tr>
+              <th>First Name</th>
+              <td>{{ selectedRequest.employee?.name }}</td>
+            </tr>
+            <tr>
+              <th>Last Name</th>
+              <td>{{ selectedRequest.employee?.last_name }}</td>
+            </tr>
+            <tr>
+              <th>Manager Name</th>
+              <td>{{ selectedRequest.manager?.name }}</td>
+            </tr>
+            <tr>
+              <th>From Location</th>
+              <td>{{ selectedRequest.from_location }}</td>
+            </tr>
+            <tr>
+              <th>To Location</th>
+              <td>{{ selectedRequest.to_location }}</td>
+            </tr>
+            <tr>
+              <th>From Date</th>
+              <td>{{ selectedRequest.from_date }}</td>
+            </tr>
+            <tr>
+              <th>To Date</th>
+              <td>{{ selectedRequest.to_date }}</td>
+            </tr>
+            <tr>
+              <th>Date Submitted</th>
+              <td>{{ selectedRequest.date_submitted }}</td>
+            </tr>
+            <tr>
+              <th>Is Lodging Required</th>
+              <td>{{ selectedRequest.islodging_needed }}</td>
+            </tr>
+            <tr>
+              <th>Mode of Travel</th>
+              <td>{{ selectedRequest.travel_mode }}</td>
+            </tr>
+            <tr>
+              <th>Accommodation Name</th>
+              <td>{{ selectedRequest.accommodation_name }}</td>
+            </tr>
+            <tr>
+              <th>Accommodation Type</th>
+              <td>{{ selectedRequest.accommodation_type }}</td>
+            </tr>
+            <tr>
+              <th>Purpose of Travel</th>
+              <td>{{ selectedRequest.purpose }}</td>
+            </tr>
+            <tr>
+              <th>Additional Note</th>
+              <td>{{ selectedRequest.additional_note }}</td>
+            </tr>
+            <tr>
+              <th>Status</th>
+              <td>{{ selectedRequest.status }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Create Employee Modal -->
+<div class="modal fade" id="createEmployeeModal" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Create Employee</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <form (submit)="onCreateUser($event, 'employee')">
+          <div class="mb-3">
+            <label class="form-label">Name</label>
+            <input 
+              type="text" 
+              class="form-control" 
+              [(ngModel)]="name" 
+              name="name" 
+              required 
+            >
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Username</label>
+            <input 
+              type="text" 
+              class="form-control" 
+              [(ngModel)]="username" 
+              name="username" 
+              required 
+            >
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Email</label>
+            <input 
+              type="email" 
+              class="form-control" 
+              [(ngModel)]="email" 
+              name="email" 
+              required 
+            >
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Password</label>
+            <input 
+              type="password" 
+              class="form-control" 
+              [(ngModel)]="password" 
+              name="password" 
+              required 
+            >
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Manager ID</label>
+            <input 
+              type="text" 
+              class="form-control" 
+              [(ngModel)]="manager_id" 
+              name="manager_id" 
+              required 
+            >
+          </div>
+          <button type="submit" class="btn btn-primary">Create Employee</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Create Manager Modal -->
+<div class="modal fade" id="createManagerModal" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Create Manager</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <form (submit)="onCreateUser($event, 'manager')">
+          <div class="mb-3">
+            <label class="form-label">Name</label>
+            <input 
+              type="text" 
+              class="form-control" 
+              [(ngModel)]="name" 
+              name="name" 
+              required 
+            >
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Username</label>
+            <input 
+              type="text" 
+              class="form-control" 
+              [(ngModel)]="username" 
+              name="username" 
+              required 
+            >
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Email</label>
+            <input 
+              type="email" 
+              class="form-control" 
+              [(ngModel)]="email" 
+              name="email" 
+              required 
+            >
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Password</label>
+            <input 
+              type="password" 
+              class="form-control" 
+              [(ngModel)]="password" 
+              name="password" 
+              required 
+            >
+          </div>
+          <button type="submit" class="btn btn-success">Create Manager</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>

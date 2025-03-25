@@ -1,0 +1,43 @@
+/* Input Fields */
+.form-control {
+    border-radius: 5px;
+    border: 1px solid #ced4da;
+}
+
+.form-control:focus {
+    border-color: #007bff;
+    box-shadow: none;
+}
+
+/* Labels */
+.form-label {
+    font-weight: bold;
+}
+
+/* Radio Buttons */
+.form-check-label {
+    font-weight: 500;
+}
+
+/* Buttons */
+.btn-warning, .btn-success {
+    width: 150px;
+    font-size: 1rem;
+    font-weight: bold;
+}
+
+/* Modal */
+.modal-content {
+    border-radius: 10px;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .container {
+        padding: 15px;
+    }
+
+    .btn-warning, .btn-success {
+        width: 100%;
+    }
+}

@@ -1,0 +1,36 @@
+<section class="login-background d-flex align-items-center justify-content-center vh-100">
+    <div class="container">
+        <header class="text-center fs-1 mb-4 greetings-color" role="banner">Employee Login</header>
+        
+        <section class="row justify-content-center">
+            <article class="col-lg-4 col-md-6">
+                <div class="card border-0 rounded shadow-lg">
+                    <div class="card-body">
+                        <h2 class="card-title text-center mb-4">Log in</h2>
+
+                        <!-- Add ngSubmit to form -->
+                        <form (ngSubmit)="onLogin()" #loginForm="ngForm">
+                            <div class="mb-3">
+                                <label for="username" class="form-label">Username</label>
+                                <input type="text" id="username" class="form-control shadow-sm p-2"
+                                       [(ngModel)]="username" name="username" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="password" class="form-label">Password</label>
+                                <input type="password" id="password" class="form-control shadow-sm p-2"
+                                       [(ngModel)]="password" name="password" required>
+                            </div>
+                            <div class="text-center">
+                                <button type="submit" class="btn button-color w-100 py-2">Login</button>
+                            </div>
+                            <!-- Show error message if login fails -->
+                        <!-- <p *ngIf="errorMessage" style="color: red;">{{ errorMessage }}</p> -->
+
+                        </form>
+
+                    </div>
+                </div>
+            </article>
+        </section>
+    </div>
+</section>

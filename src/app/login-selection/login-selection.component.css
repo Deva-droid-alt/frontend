@@ -1,0 +1,93 @@
+:host {
+    --primary-color: #2e7d32; /* Dark Green */
+    --secondary-color: #66bb6a; /* Light Green */
+    --gradient-btn: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+    --text-color: #ffffff; /* White */
+    --bg-color: #f4f4f4; /* Light Gray */
+}
+
+/* General Reset */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* Welcome Section */
+.welcome-container {
+    text-align: center;
+    padding: 20px;
+    background-color: var(--bg-color);
+}
+
+.welcome-container img {
+    display: block;
+    margin: 0 auto 10px;
+}
+
+.welcome-container h1 {
+    font-size: 24px;
+    font-weight: bold;
+    color: var(--primary-color);
+}
+
+/* Main Container */
+.container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    padding: 20px;
+}
+
+/* Left Side Image */
+.image-container img {
+    max-width: 100%;
+    height: auto;
+}
+
+/* Right Side - Login Section */
+.login-container {
+    max-width: 400px;
+    padding: 20px;
+}
+
+/* Login Options */
+.login-options {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    margin-top: 20px;
+}
+
+/* Gradient Buttons */
+.btn-login {
+    display: block;
+    padding: 12px;
+    border-radius: 5px;
+    text-decoration: none;
+    font-size: 18px;
+    font-weight: bold;
+    text-align: center;
+    background: var(--gradient-btn);
+    color: var(--text-color);
+    border: none;
+    transition: transform 0.2s, background 0.3s;
+}
+
+.btn-login:hover {
+    background: linear-gradient(45deg, var(--secondary-color), var(--primary-color));
+    transform: scale(1.05);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .container {
+        flex-direction: column;
+    }
+
+    .image-container {
+        margin-bottom: 20px;
+    }
+}

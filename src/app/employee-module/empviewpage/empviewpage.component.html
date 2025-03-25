@@ -1,0 +1,187 @@
+<div class="container">
+    <h1 class="text-center mx-auto mt-5">RECENT TRAVEL REQUESTS</h1>
+    <article class="row g-3 align-items-end">
+        <div class="col-md-4">
+            <label for="managerName" class="form-label">Manager Name</label>
+            <input type="text" class="form-control" [value]="managerName" readonly>
+
+        </div>
+  </article>
+</div>
+
+<!-- Table Section -->
+<div class="container mt-4">
+    <div class="row mt-5">
+      <div class="col-md-12 table-responsive">
+        <table class="table table-hover">
+          <thead>
+            <tr>
+              <th scope="col">Id</th>
+             
+              <th scope="col">Requested Date</th>
+              <th scope="col">From Location</th>
+              <th scope="col">To Location</th>
+              <th scope="col">From Date</th>
+              <th scope="col">To Date</th>
+              <th scope="col">Status</th>
+              <th scope="col">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let request of travelRequests">
+              <th scope="row">{{ request.id }}</th>
+              <!-- <td>{{ request.employee.name }}</td> -->
+              <td>{{ request.date_submitted | date:'dd-MM-yyyy' }}</td>
+              <td>{{ request.from_location }}</td>
+              <td>{{ request.to_location }}</td>
+              <td>{{ request.from_date | date:'dd-MM-yyyy' }}</td>
+              <td>{{ request.to_date | date:'dd-MM-yyyy' }}</td>
+              <td>{{ request.status }}</td>
+              <td>
+                <button class="btn btn-primary" (click)="viewRequest(request.id)" data-bs-toggle="modal" data-bs-target="#viewModal"><i class="bi bi-eye"></i></button>
+                <button class="btn btn-warning btn-sm" (click)="editRequest(request)" [disabled]="request.status !== 'resubmit'"><i class="bi bi-pencil"></i></button>
+                <button class="btn btn-danger btn-sm" (click)="deleteRequest(request.id)" ><i class="bi bi-trash-fill"></i></button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <!-- Include the modal component -->
+      
+        <div class="modal fade" id="viewModal" tabindex="-1" aria-labelledby="viewModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h5 class="modal-title" id="viewModalLabel">Request Details</h5>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body" *ngIf="selectedRequest as selected">
+                  <table class="table table-bordered">
+                    <tbody>
+                      <tr>
+                        <th>First Name</th>
+                        <td>{{ selected.employee?.name}}</td>
+                      </tr>
+                      <tr>
+                        <th>Last Name</th>
+                        <td>{{ selected.employee?.last_name}}</td>
+                      </tr>
+                      <tr>
+                        <th>Manager Name</th>
+                        <td>{{ selected.manager?.name }}</td>
+                      </tr>
+                      <tr>
+                        <th>From Location</th>
+                        <td>{{ selected.from_location }}</td>
+                      </tr>
+                      <tr>
+                        <th>To Location</th>
+                        <td>{{ selected.to_location }}</td>
+                      </tr>
+                      <tr>
+                        <th>From Date</th>
+                        <td>{{ selected.from_date }}</td>
+                      </tr>
+                      <tr>
+                        <th>To Date</th>
+                        <td>{{ selected.to_date }}</td>
+                      </tr>
+                      <tr>
+                        <th>Date Submitted</th>
+                        <td>{{ selected.date_submitted }}</td>
+                      </tr>
+                      <tr>
+                        <th>Is Lodging Required</th>
+                        <td>{{ selected.
+                          islodging_needed}}</td>
+                      </tr>
+                      <tr>
+                        <th>Mode of Travel</th>
+                        <td>{{ selected.travel_mode }}</td>
+                      </tr>
+                      <tr>
+                        <th>Accommodation Name</th>
+                        <td>{{ selected.accommodation_name }}</td>
+                      </tr>
+                      <tr>
+                        <th>Accommodation Type</th>
+                        <td>{{ selected.accommodation_type }}</td>
+                      </tr>
+                      <tr>
+                        <th>Purpose of Travel</th>
+                        <td>{{ selected.purpose }}</td>
+                      </tr>
+                      <tr>
+                        <th>Additional Note</th>
+                        <td>{{ selected.additional_note }}</td>
+                      </tr>
+                      <tr>
+                        <th>Status</th>
+                        <td>{{ selected.status }}</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+                <div class="modal-footer">
+                  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+              </div>
+            </div>
+          </div>        
+            
+<!--  Edit Modal (Appears only if status is 'resubmit') -->
+ <div *ngIf="editModalVisible" class="modal show d-block" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+      <div class="modal-content">
+          <div class="modal-header">
+              <h5 class="modal-title" id="editModalLabel">Edit Travel Request</h5>
+              <button type="button" class="btn-close" (click)="closeEditModal()" aria-label="Close"></button>
+
+          </div>
+          <div class="modal-body" *ngIf="selectedRequest as selected">
+              <form (ngSubmit)="submitEditRequest()">
+                  <div class="mb-3">
+                      <label class="form-label">From Location</label>
+                      <input type="text" class="form-control" [(ngModel)]="selectedRequest.from_location" name="from_location" required>
+                  </div>  
+                  <div class="mb-3">
+                      <label class="form-label">To Location</label>
+                      <input type="text" class="form-control" [(ngModel)]="selectedRequest.to_location" name="to_location" required>
+                  </div>
+                  <div class="mb-3">
+                      <label class="form-label">From Date</label>
+                      <input type="date" class="form-control" [(ngModel)]="selectedRequest.from_date" name="from_date" required>
+                  </div>
+                  <div class="mb-3">
+                      <label class="form-label">To Date</label>
+                      <input type="date" class="form-control" [(ngModel)]="selectedRequest.to_date" name="to_date" required>
+                  </div>
+                  <div class="mb-3">
+                      <label class="form-label">Purpose of Travel</label>
+                      <textarea class="form-control" [(ngModel)]="selectedRequest.purpose" name="purpose" required></textarea>
+                  </div>
+                  <div class="mb-3">
+                      <label class="form-label">Note to Manager</label>
+                      <textarea class="form-control" [(ngModel)]="editedRequest.updatereq_asked_by_manager" name="note_to_manager"></textarea>
+                  </div>
+                  <div class="mb-3">
+                      <label class="form-label">Note to Admin</label>
+                      <textarea 
+                      class="form-control" 
+                      [(ngModel)]="editedRequest.updatereq_asked_by_admin" 
+                      name="updatereq_asked_by_admin"
+                      required></textarea>                  </div>
+                  <div class="modal-footer">
+                      <button type="submit" class="btn btn-success">Submit</button>
+                      <button type="button" class="btn btn-secondary" (click)="closeEditModal()">Close</button>
+                  </div>
+              </form>
+          </div>
+      </div>
+  </div>
+</div>
+
+      </div>
+    </div>
+</div> 
+
+

@@ -1,0 +1,91 @@
+<div class="container mt-5">
+    <h1 class="text-center">NEW TRAVEL REQUEST FORM</h1>
+
+    <form [formGroup]="requestForm" (ngSubmit)="submitForm()">
+        <div class="row mt-4">
+            <div class="col-md-3">
+                <label for="first_name"  class="form-label">Name</label>
+                <input type="text" class="form-control" [value]="employeeName" disabled />
+            </div>
+            <div class="col-md-3">
+                <label for="managerName" class="form-label">Manager Name</label>
+                <input type="text" class="form-control" [value]="managerName" disabled>
+            </div>
+            <div class="col-md-3">
+                <label for="modeOfTravel" class="form-label">Mode of Travel</label>
+                <select class="form-control" formControlName="modeOfTravel">
+                    <option value="">Select Mode</option>
+                    <option value="train">Train</option>
+                    <option value="bus">Bus</option>
+                    <option value="air">Air</option>
+                    <option value="car">Car</option>
+                    <option value="ship">Ship</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-3">
+                <label for="fromLocation">From</label>
+                <input type="text" class="form-control" formControlName="fromLocation" placeholder="Location">
+            </div>
+            <div class="col-md-3">
+                <label for="toLocation">To</label>
+                <input type="text" class="form-control" formControlName="toLocation" placeholder="Location">
+            </div>
+            <div class="col-md-3">
+                <label for="startDate">Start Date</label>
+                <input type="date" class="form-control" formControlName="startDate">
+            </div>
+            <div class="col-md-3">
+                <label for="endDate">End Date</label>
+                <input type="date" class="form-control" formControlName="endDate">
+            </div>
+        </div>
+
+        <div class="row mb-1">
+            <div class="col-md-2">
+                <label>Is lodging required?</label>
+                <div class="form-check">
+                    <input class="form-check-input" type="radio" formControlName="lodgingRequired" [value]="true">
+                    <label class="form-check-label">Yes</label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="radio" formControlName="lodgingRequired" [value]="false">
+                    <label class="form-check-label">No</label>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <label for="accommodation_name" class="form-label">Accommodation Name</label>
+                <input type="text" class="form-control" formControlName="accommodationName">
+            </div>
+            <div class="col-md-3">
+                <label for="accommodation_type" class="form-label">Accommodation Type</label>
+                <input type="text" class="form-control" formControlName="accommodationType">
+            </div>
+            <div class="col-md-4">
+                <label for="purpose" class="form-label">Purpose of Travel</label>
+                <textarea class="form-control" formControlName="purpose"></textarea>
+            </div>
+            <div class="col-md-4">
+                <label for="additional_note" class="form-label">Additional Note</label>
+                <textarea class="form-control" formControlName="additionalRequests"></textarea>
+            </div>
+        </div>
+        <div class="row mb-1">
+            <div class="col-md-5">
+                <label for="manager_note" class="form-label">Notes from manager or admin</label>
+                <textarea class="form-control" formControlName="managerNote"></textarea>
+            </div>
+        </div>
+
+        <div class="row mb-4">
+            <div class="col-md-6 text-center">
+                <button type="reset" class="btn btn-warning">Cancel</button>
+            </div>
+            <div class="col-md-6 text-center">
+                <button type="submit" class="btn btn-success" >Submit</button>
+            </div>
+        </div>
+    </form>
+</div>

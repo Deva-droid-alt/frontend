@@ -1,0 +1,219 @@
+<!-- Filter Section -->
+<section>
+  <div class="filter-container p-3">
+    <form [formGroup]="filterForm" (ngSubmit)="applyFilters()">
+      <div class="row g-2">        
+        <!-- Status Filter -->
+        <div class="col-md-2">
+          <select formControlName="status" class="form-select form-select-sm">
+            <option value="">All Status</option>
+            <option value="pending">Pending</option>
+            <option value="approved">Approved</option>
+            <option value="rejected">Rejected</option>
+            <option value="resubmitted">Resubmitted</option>
+            <option value="closed">Closed</option>
+          </select>
+        </div>
+        
+        <!-- Employee Search -->
+        <div class="col-md-2">
+          <input type="text" formControlName="name" class="form-control form-control-sm"
+            placeholder="Search Employee Name">
+        </div>
+        
+        <!-- From Date -->
+        <div class="col-md-2">
+          <input type="date" formControlName="from_date" class="form-control form-control-sm">
+        </div>
+        
+        <!-- To Date -->
+        <div class="col-md-2">
+          <input type="date" formControlName="to_date" class="form-control form-control-sm">
+        </div>
+        
+        <!-- Filter Button -->
+        <div class="col-md-2 d-grid">
+          <button type="submit" class="btn btn-primary btn-sm fw-bold">Filter</button>
+        </div>
+        
+        <!-- Reset Button -->
+        <div class="col-md-2 d-grid">
+          <button type="button" (click)="resetFilters()" class="btn btn-secondary btn-sm fw-bold">Reset</button>
+        </div>
+      </div>
+    </form>
+  </div>
+</section>
+
+<!-- Table Section -->
+<div class="container mt-4">
+    <div class="row mt-5">
+      <div class="col-md-12 table-responsive">
+        <table class="table table-hover">
+          <thead>
+            <tr>
+              <th scope="col">Id</th>
+              <th scope="col">Requested Date</th>
+              <th scope="col">Name</th>              
+              <th scope="col">From Location</th>
+              <th scope="col">To Location</th>
+              <th scope="col">From Date</th>
+              <th scope="col">To Date</th>
+              <th scope="col">Status</th>
+              <th scope="col">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let request of filteredTravelRequests">
+              <th scope="row">{{ request.id }}</th>
+              <td>{{ request.date_submitted | date:'dd-MM-yyyy' }}</td>
+              <td>{{ request.name}}</td>
+              <td>{{ request.from_location }}</td>
+              <td>{{ request.to_location }}</td>
+              <td>{{ request.from_date | date:'dd-MM-yyyy' }}</td>
+              <td>{{ request.to_date | date:'dd-MM-yyyy' }}</td>
+              <td>
+                <span class="badge" 
+                  [ngClass]="{
+                    'bg-success': request.status === 'approved',
+                    'bg-danger': request.status === 'rejected',
+                    'bg-warning': request.status === 'resubmit',
+                    'bg-secondary': request.status === 'resubmitted',
+                    'bg-info': request.status === 'pending'
+                  }">
+                  {{ request.status }}
+                </span>
+              </td>
+              <td>
+                <button class="btn btn-primary me-1" (click)="viewRequest(request)" data-bs-toggle="modal" data-bs-target="#viewModal">
+                  <i class="bi bi-eye-fill"></i>
+                </button>
+                
+                <button *ngIf="request.status==='approved'" disabled class="btn btn-success btn-sm me-1" (click)="updateStatus(request, 'approved')">
+                  <i class="bi bi-check-circle"></i>
+                </button>
+
+                <button *ngIf="request.status==='pending'||request.status==='resubmitted'||request.status==='resubmit'" class="btn btn-success btn-sm me-1" (click)="updateStatus(request, 'approved')">
+                  <i class="bi bi-check-circle"></i>
+                </button>
+              
+                <button class="btn btn-danger btn-sm me-1" (click)="updateStatus(request, 'rejected')">
+                  <i class="bi bi-x-circle"></i>
+                </button>
+              
+                <button class="btn btn-secondary btn-sm" 
+                        data-bs-toggle="modal"
+                        data-bs-target="#resubmitModal"
+                        (click)="openResubmitModal(request)">
+                  <i class="bi bi-arrow-repeat"></i>
+                </button>
+              </td>            
+            </tr>
+          </tbody>
+        </table>
+
+        <!-- Resubmit Modal -->
+        <div *ngIf="sModalVisible" class="modal fade show d-block" tabindex="-1" role="dialog">
+          <div class="modal-dialog">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title">Resubmit Request</h5>
+                <button type="button" class="btn-close" (click)="sModalVisible = false"></button>
+              </div>
+              <div class="modal-body">
+                <textarea [(ngModel)]="resubmitNote" class="form-control" placeholder="Enter reason for resubmission"></textarea>
+              </div>
+              <div class="modal-footer">
+                <button class="btn btn-secondary" (click)="sModalVisible = false">Close</button>
+                <button class="btn btn-primary" (click)="confirmResubmit()">Send</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Backdrop -->
+        <div *ngIf="sModalVisible" class="modal-backdrop fade show"></div>
+
+        <!-- View Modal -->
+        <div class="modal fade" id="viewModal" tabindex="-1" aria-labelledby="viewModalLabel" aria-hidden="true">
+          <div class="modal-dialog">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title" id="viewModalLabel">Request Details</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+              </div>
+              <div class="modal-body" *ngIf="selectedRequest as selected">
+                <table class="table table-bordered">
+                  <tbody>
+                    <tr>
+                      <th>First Name</th>
+                      <td>{{ selected.employee?.name }}</td>
+                    </tr>
+                    <tr>
+                      <th>Last Name</th>
+                      <td>{{ selected.employee?.last_name }}</td>
+                    </tr>
+                    <tr>
+                      <th>Manager Name</th>
+                      <td>{{ selected.manager?.name }}</td>
+                    </tr>
+                    <tr>
+                      <th>From Location</th>
+                      <td>{{ selected.from_location }}</td>
+                    </tr>
+                    <tr>
+                      <th>To Location</th>
+                      <td>{{ selected.to_location }}</td>
+                    </tr>
+                    <tr>
+                      <th>From Date</th>
+                      <td>{{ selected.from_date }}</td>
+                    </tr>
+                    <tr>
+                      <th>To Date</th>
+                      <td>{{ selected.to_date }}</td>
+                    </tr>
+                    <tr>
+                      <th>Date Submitted</th>
+                      <td>{{ selected.date_submitted }}</td>
+                    </tr>
+                    <tr>
+                      <th>Is Lodging Required</th>
+                      <td>{{ selected.islodging_needed }}</td>
+                    </tr>
+                    <tr>
+                      <th>Mode of Travel</th>
+                      <td>{{ selected.travel_mode }}</td>
+                    </tr>
+                    <tr>
+                      <th>Accommodation Name</th>
+                      <td>{{ selected.accommodation_name }}</td>
+                    </tr>
+                    <tr>
+                      <th>Accommodation Type</th>
+                      <td>{{ selected.accommodation_type }}</td>
+                    </tr>
+                    <tr>
+                      <th>Purpose of Travel</th>
+                      <td>{{ selected.purpose }}</td>
+                    </tr>
+                    <tr>
+                      <th>Additional Note</th>
+                      <td>{{ selected.additional_note }}</td>
+                    </tr>
+                    <tr>
+                      <th>Status</th>
+                      <td>{{ selected.status }}</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+</div>

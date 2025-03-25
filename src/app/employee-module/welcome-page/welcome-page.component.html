@@ -1,0 +1,13 @@
+<main class="container">
+    <section class="box" aria-labelledby="welcome-heading">
+        <h1 id="welcome-heading">Welcome to Employee's Travel Booking Page</h1>
+        <nav class="button-container" aria-label="Navigation for travel requests">
+            <button class="btn" (click)="navigateTo('/recent-requests')" aria-label="View Recent Requests">
+                Recent Requests
+            </button>
+            <button class="btn" (click)="navigateTo('/new-requests')" aria-label="Create New Request">
+                New Request
+            </button>
+        </nav>
+    </section>
+</main>
